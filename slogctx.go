@@ -21,11 +21,11 @@ var (
 
 func New(handler slog.Handler) *slog.Logger {
 	if handler == nil {
-		handler = slog.NewJSONHandler(os.Stdout,
+		handler = slog.NewTextHandler(os.Stdout,
 			&slog.HandlerOptions{
 				AddSource:   false,
 				Level:       slog.LevelInfo,
-				ReplaceAttr: replaceAttr,
+				ReplaceAttr: ReplaceAttr,
 			})
 	}
 

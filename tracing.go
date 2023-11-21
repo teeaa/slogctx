@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func replaceAttr(groups []string, a slog.Attr) slog.Attr {
+func ReplaceAttr(groups []string, a slog.Attr) slog.Attr {
 	// Only add trace to errors
 	switch a.Value.Kind() {
 	case slog.KindAny:
