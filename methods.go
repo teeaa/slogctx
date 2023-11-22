@@ -3,7 +3,6 @@ package slogctx
 import (
 	"context"
 	"log/slog"
-	"sync"
 )
 
 func Debug(ctx context.Context, msg string, args ...any) {
@@ -20,21 +19,4 @@ func Warn(ctx context.Context, msg string, args ...any) {
 
 func Error(ctx context.Context, msg string, args ...any) {
 	slog.ErrorContext(ctx, msg, args...)
-}
-
-func WithValue(parent context.Context, key string, val any) context.Context {
-	if parent == nil {
-		parent = context.Background()
-	}
-
-	if v, ok := parent.Value(fields).(*sync.Map); ok {
-		v.Store(key, val)
-
-		return context.WithValue(parent, fields, v)
-	}
-
-	v := &sync.Map{}
-	v.Store(key, val)
-
-	return context.WithValue(parent, fields, v)
 }
