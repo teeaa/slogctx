@@ -10,21 +10,18 @@ import (
 	"github.com/pkg/errors"
 )
 
-var timeFormat = time.RFC3339
+var defaultTimeFormat = "2006-01-02 15:04:05.999999 -0700 MST"
 
 func ReplaceAttr(groups []string, a slog.Attr) slog.Attr {
-	// fmt.Printf("key %v, value %v\n", a.Key, a.Value)
-	if a.Key == "time" {
-		if timeFormat == "" {
-			return slog.Attr{}
-		} else if timeFormat != time.RFC3339 {
-			t, err := time.Parse("2006-01-02 15:04:05.99999 -0700 MST", a.Value.String())
+	if a.Key == slog.TimeKey {
+		if timeFormat != "" {
+			t, err := time.Parse(defaultTimeFormat, a.Value.String())
 			if err != nil {
 				return a
 			}
 			return slog.Attr{
-				Key:   "time",
-				Value: slog.StringValue(t.Format(time.DateTime)),
+				Key:   slog.TimeKey,
+				Value: slog.StringValue(t.Format(timeFormat)),
 			}
 		}
 	}
@@ -44,7 +41,7 @@ func ReplaceAttr(groups []string, a slog.Attr) slog.Attr {
 func formatError(err error) slog.Value {
 	var groupValues []slog.Attr
 
-	groupValues = append(groupValues, slog.String("msg", err.Error()))
+	groupValues = append(groupValues, slog.String(messageKey, err.Error()))
 
 	type StackTracer interface {
 		StackTrace() errors.StackTrace
@@ -54,7 +51,8 @@ func formatError(err error) slog.Value {
 	// errors.Wrap, or errors.WithStack call.
 	var st StackTracer
 	for err := err; err != nil; err = errors.Unwrap(err) {
-		if x, ok := err.(StackTracer); ok {
+		x, ok := err.(StackTracer)
+		if ok {
 			st = x
 		}
 	}

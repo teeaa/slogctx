@@ -21,12 +21,14 @@ _Note: If you don't have context available you can replace it with `nil`_
 
 ### Using context
 
-To add new fields to context, do it with `slogctx.WithValue()`:
+To add an entry to be in every log line afterwards, add it with `slogctx.WithValue()`:
 
 ```Go
 // ctx is already defined somewhere
-slogctx.WithValue(ctx, "var name", var)
+slogctx.WithValue(ctx, "ctx key", "ctx value")
 ```
+
+This will cause `slogctx.Info("foo")` to print out `"msg"="foo" "ctx key"="ctx value"`
 
 ## Modifying log level and time format
 
@@ -54,8 +56,13 @@ slogctx.NewWithHandler(slog.NewTextHandler(os.Stdout,
 
 _Note: You can't define time format with the default slog handler_
 
-## Benefits
+## AWS and GCP specific logging
 
-If you get context from, for example your service's REST endpoint being called, you can add values to context that might help with debugging. Then when you carry the context forwards, these values will be carried as well so identifying bugs and things will be easier.
+To enable AWS and GCP specific logging (for field names and value formatting) use
+slogctx.New(&slogctx.HandlerOptions{
+			EnableAWS: true,
+			EnableGCP: true,
+		})
+```
 
-Also our `otel` package adds a trace id to the context by default, so if you log context, you will much more easily find all the log entries from that call by filtering with that trace id.
+This will auto-detect if the code is running in AWS or GCP environment and format accordingly. If it isn't running in either environment it will fall back to default behaviour (with a short delay)
