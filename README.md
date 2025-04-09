@@ -59,6 +59,7 @@ _Note: You can't define time format with the default slog handler_
 ## AWS and GCP specific logging
 
 To enable AWS and GCP specific logging (for field names and value formatting) use
+```Go
 slogctx.New(&slogctx.HandlerOptions{
 			EnableAWS: true,
 			EnableGCP: true,
